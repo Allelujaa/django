@@ -1,0 +1,30 @@
+{% extends 'parkinglist/layout.html' %}
+
+{% block content %}
+
+<b>
+    검색한 차:
+    {{ car.first.car_no }}
+</b>
+<table border="1">
+    <tr>
+        <th>차량번호</th>
+        <th>위치</th>
+        <th>출입</th>
+        <th>퇴장</th>
+        <th>요금</th>
+        <th>현재유무</th>
+    </tr>
+    {% for car_searched in car.all %}
+    <tr>
+        <td>{{car_searched.carno}}</td>
+        <td>{{car_searched.location}}</td>
+        <td>{{car_searched.parkingtime}}</td>
+        <td>{{car_searched.exittime}}</td>
+        <td>{{car_searched.cost}}</td>
+        <td>{{car_searched.currexist}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

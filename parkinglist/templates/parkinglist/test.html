@@ -1,0 +1,16 @@
+{% extends 'parkinglist/layout.html' %}
+
+{% block content %}
+
+<b>
+    검색한 차:
+    {{ car }}
+    {{ in_datetime_start }}
+    {{ in_datetime_end }}
+    {{ out_datetime_start }}
+    {{ out_datetime_end }}
+    {{ cost }}
+    {{ location }}
+</b>
+
+{% endblock %}

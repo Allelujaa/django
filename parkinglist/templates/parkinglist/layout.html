@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>주차관리시스템</title>
+</head>
+<body>
+    <header>
+        <h1>주차관리시스템</h1>
+    </header>
+    <div>
+        {% block content %}
+        {% endblock %}
+    </div>
+    <br>
+    <a href="/">홈</a>
+    <br>
+    <a href="/admin">Admin Login</a>
+    <br>
+    <a href="/parkinglist">차량 목록</a>
+    <br>
+    <a href="/parkinglist/search">검색</a>
+    <br>
+    <a href="/parkinglist/adv_search">특수검색</a>
+</body>
+</html>
