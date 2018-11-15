@@ -178,5 +178,3 @@ class Weightvalue(models.Model):
     class Meta:
         managed = False
         db_table = 'weightValue'
-
-#this is a change
