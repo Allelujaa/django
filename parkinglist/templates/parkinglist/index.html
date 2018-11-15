@@ -1,0 +1,18 @@
+{% extends 'parkinglist/layout.html' %}
+
+{% block content %}
+{{title}}
+
+<table border="1">
+    {% for x in car2darray %}
+    <tr>
+        {% for y in x %}
+        <td>
+            {{y}}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
