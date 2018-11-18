@@ -91,6 +91,12 @@ class Currparkinglot(models.Model):
     sectionno = models.CharField(db_column='sectionNo', primary_key=True, max_length=10)  # Field name made lowercase.
     carno = models.CharField(db_column='carNo', max_length=10, null=True)  # Field name made lowercase.
     currexist = models.IntegerField(db_column='currExist', null=True)  # Field name made lowercase.
+    avalue = models.IntegerField(db_column='Aval', null=True)
+    bvalue = models.IntegerField(db_column='Bval', null=True)
+    cvalue = models.IntegerField(db_column='Cval', null=True)
+    dvalue = models.IntegerField(db_column='Dval', null=True)
+    evalue = models.IntegerField(db_column='Eval', null=True)
+    fvalue = models.IntegerField(db_column='Fval', null=True)
 
     class Meta:
         managed = False
@@ -154,12 +160,11 @@ class Flight(models.Model):
 
 class Parkinglot(models.Model):
     carno = models.CharField(db_column='carNo', primary_key=True, max_length=10)  # Field name made lowercase.
-    location = models.CharField(max_length=10, null=True, blank=True)
     parkingtime = models.DateTimeField(db_column='parkingTime', blank=True, null=True)  # Field name made lowercase.
     exittime = models.DateTimeField(db_column='exitTime', blank=True, null=True)  # Field name made lowercase.
     cost = models.IntegerField(blank=True, null=True)
     currexist = models.IntegerField(db_column='currExist', null=True)  # Field name made lowercase.
-    sectionno = models.IntegerField(db_column='sectionNo', null=True)
+    sectionno = models.CharField(db_column='sectionNo', max_length=10, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -167,14 +172,3 @@ class Parkinglot(models.Model):
     
     def __str__(self):
         return self.carno
-
-
-class Weightvalue(models.Model):
-    sectionno = models.CharField(db_column='sectionNo', primary_key=True, max_length=10, blank=True)  # Field name made lowercase.
-    aval = models.IntegerField(db_column='AVal', blank=True, null=True)  # Field name made lowercase.
-    bval = models.IntegerField(db_column='BVal', blank=True, null=True)  # Field name made lowercase.
-    cval = models.IntegerField(db_column='CVal', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'weightValue'
