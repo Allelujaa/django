@@ -1,5 +1,13 @@
 # [START django_app]
-runtime: python37
+runtime: python
+env: flex
+entrypoint: gunicorn -b :$PORT djangoproject.wsgi
+
+beta_settings:
+  cloud_sql_instances: dev-airlock-218215:asia-east1:software7
+
+runtime_config:
+  python_version: 3
 
 handlers:
 # This configures Google App Engine to serve the files in the app's static

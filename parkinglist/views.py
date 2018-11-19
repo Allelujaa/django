@@ -5,6 +5,8 @@ from .forms import SearchForm, AdvSearchForm
 from django.views.generic.edit import CreateView
 from django.db.models import Q
 import datetime
+from .calculate import calculate
+from .recommend import Induce
 
 def color(x):
     if x == 0:
@@ -46,19 +48,17 @@ def index(request):
     }
     return render(request, 'parkinglist/index.html', context)
 
-def detail(request, carno):
-    try:
-        car = Parkinglot.objects.filter(carno=carno)
-    except Parkinglot.objects.filter(carno=carno).DoesNotExist:
-        raise Http404("Car does not exist")
-    return render(request, 'parkinglist/detail.html', {'car' : car})
-
 def get_search(request):
     if request.method == 'POST':
         form = SearchForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data.get('searched_car')
             car = Parkinglot.objects.filter(carno=data)
+            # update cost if car exists
+            for x in car:
+                if x.currexist == 1:
+                    x.cost = calculate(x.parkingtime)
+                    x.save()
             return render(request, 'parkinglist/detail.html', {'car' : car})
     else:
         form = SearchForm()
@@ -106,8 +106,15 @@ def adv_search(request):
             if exists != '':   #현재 유무 조건 있을 때
                 q &= Q(currexist=int(exists))
 
+            car = Parkinglot.objects.filter(q)   #필터링
+            # update cost if car exists
+            for x in car:
+                if x.currexist == 1:
+                    x.cost = calculate(x.parkingtime)
+                    x.save()
+
             context = {
-                'car': Parkinglot.objects.filter(q)   #필터링
+                'car': car
             }
             return render(request, 'parkinglist/detail.html', context)
         
