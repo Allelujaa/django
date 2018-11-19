@@ -85,36 +85,22 @@ WSGI_APPLICATION = 'djangoproject.wsgi.application'
 import pymysql  # noqa: 402
 pymysql.install_as_MySQLdb()
 
-# [START db_setup]
-if os.getenv('GAE_APPLICATION', None):
-    # Running on production App Engine, so connect to Google Cloud SQL using
-    # the unix socket at /cloudsql/<your-cloudsql-connection string>
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': '/cloudsql/dev-airlock-218215:asia-east1:software7',
-            'USER': 'root',
-            'PASSWORD': '2018',
-            'NAME': 'project7',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': 'root',
+        'PASSWORD': '2018',
+        'NAME': 'project7',
+        'PORT': '3306',
     }
+}
+
+DATABASES['default']['HOST'] = '/cloudsql/dev-airlock-218215:asia-east1:software7'
+
+if os.getenv('GAE_INSTANCE'):
+    pass
 else:
-    # Running locally so connect to either a local MySQL instance or connect to
-    # Cloud SQL via the proxy. To start the proxy via command line:
-    #
-    #     $ cloud_sql_proxy -instances=[INSTANCE_CONNECTION_NAME]=tcp:3306
-    #
-    # See https://cloud.google.com/sql/docs/mysql-connect-proxy
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
-            'NAME': 'project7',
-            'USER': 'root',
-            'PASSWORD': '2018',
-        }
-    }
+    DATABASES['default']['HOST'] = '127.0.0.1'
 # [END db_setup]
 
 
@@ -148,11 +134,11 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_ROOT = 'static'
-STATIC_URL = '/static/'
+STATIC_URL = '/storage.googleapis.com/dev-airlock-218215.appspot.com/static/'

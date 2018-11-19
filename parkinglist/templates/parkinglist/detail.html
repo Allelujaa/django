@@ -4,7 +4,6 @@
 
 <b>
     검색한 차:
-    {{ car.first.car_no }}
 </b>
 <table border="1">
     <tr>
@@ -16,13 +15,21 @@
         <th>현재유무</th>
     </tr>
     {% for car_searched in car.all %}
+    {% if car_searched.currexist == 1 %}
+    <tr style="color:red">
+    {% else %}
     <tr>
+    {% endif %}
         <td>{{car_searched.carno}}</td>
         <td>{{car_searched.sectionno}}</td>
         <td>{{car_searched.parkingtime}}</td>
         <td>{{car_searched.exittime}}</td>
         <td>{{car_searched.cost}}</td>
-        <td>{{car_searched.currexist}}</td>
+        {% if car_searched.currexist == 1 %}
+        <td>O</td>
+        {% else %}
+        <td>X</td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>
