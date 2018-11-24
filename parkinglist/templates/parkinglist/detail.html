@@ -1,11 +1,9 @@
-{% extends 'parkinglist/layout.html' %}
+{% extends 'parkinglist/layout2.html' %}
 
 {% block content %}
 
-<b>
-    검색한 차:
-</b>
-<table border="1">
+<br><br>
+<table class="w3-table w3-bordered">
     <tr>
         <th>차량번호</th>
         <th>위치</th>
@@ -21,9 +19,17 @@
     <tr>
     {% endif %}
         <td>{{car_searched.carno}}</td>
+        {% if car_searched.currexist == 1 %}
+        <td><a href="/parkinglist/{{car_searched.sectionno}}">{{car_searched.sectionno}}</a></td>
+        {% else %}
         <td>{{car_searched.sectionno}}</td>
+        {% endif %}
         <td>{{car_searched.parkingtime}}</td>
+        {% if car_searched.exittime == None %}
+        <td>없음</td>
+        {% else %}
         <td>{{car_searched.exittime}}</td>
+        {% endif %}
         <td>{{car_searched.cost}}</td>
         {% if car_searched.currexist == 1 %}
         <td>O</td>

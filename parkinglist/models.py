@@ -162,7 +162,7 @@ class Parkinglot(models.Model):
     carno = models.CharField(db_column='carNo', primary_key=True, max_length=10)  # Field name made lowercase.
     parkingtime = models.DateTimeField(db_column='parkingTime', blank=True, null=True)  # Field name made lowercase.
     exittime = models.DateTimeField(db_column='exitTime', blank=True, null=True)  # Field name made lowercase.
-    cost = models.IntegerField(blank=True, null=True)
+    cost = models.IntegerField(db_column='cost', blank=True, null=True)
     currexist = models.IntegerField(db_column='currExist', null=True)  # Field name made lowercase.
     sectionno = models.CharField(db_column='sectionNo', max_length=10, blank=True, null=True)
 

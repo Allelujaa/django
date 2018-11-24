@@ -1,0 +1,20 @@
+{% extends 'parkinglist/layout2.html' %}
+
+{% block content %}
+<b>
+    1년 이상 주차한 차:
+</b>
+<br><br>
+<table class="w3-table w3-bordered">
+    {% for idx in car %}
+    <tr>
+        <td>{{idx.0}}</td>
+    </tr>
+    {% endfor %}
+</table>
+<br><br>
+<form method="post">
+    {% csrf_token %}
+    <input type="submit" value="현황에서 삭제" class="w3-button w3-card w3-light-grey">
+</form>
+{% endblock %}

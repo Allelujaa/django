@@ -1,0 +1,41 @@
+{% extends 'parkinglist/layout2.html' %}
+
+{% block content %}
+<b>
+    {{title}}
+</b>
+<br><br>
+<table class="w3-table w3-bordered">
+    <tr>
+        {% for x in tabletitle %}
+        <th>{{x}}</th>
+        {% endfor %}
+    </tr>
+    
+    {% if data|length == 1 %}
+    <tr>
+        {% for x in data.0 %}
+        <td>{{x}}</td>
+        {% endfor %}
+    </tr>
+    {% elif title == '고객 통계' %}
+    <tr>
+        {% for x in data %}
+            {% for y in x %}
+            <td>{{y}}</td>
+            {% endfor %}
+        {% endfor %}
+    </tr>
+    
+    {% else %}
+        {% for x in data %}
+        <tr>
+            {% for y in x %}
+                <td>{{y}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    {% endif %}
+</table>
+
+{% endblock %}
