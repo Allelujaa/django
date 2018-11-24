@@ -141,4 +141,4 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_ROOT = 'static'
-STATIC_URL = '/storage.googleapis.com/dev-airlock-218215.appspot.com/static/'
+STATIC_URL = '/static/'

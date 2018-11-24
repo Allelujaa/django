@@ -1,51 +1,40 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from .models import Currparkinglot, Parkinglot
-from .forms import SearchForm, AdvSearchForm
+from .forms import FlightSearch, SearchForm, AdvSearchForm, StatsForm
 from django.views.generic.edit import CreateView
 from django.db.models import Q
 import datetime
-from .calculate import calculate
-from .recommend import Induce
+from . import calculate, recommend, visual, stats
 
-def color(x):
-    if x == 0:
-        return 'green'
-    else:
-        return 'red'
+def index(request, show='default'):
+    car2darray = visual.visualize()
 
-def index(request):
-    currentlot = Currparkinglot.objects.all().order_by('sectionno')
-    # car2darray[3][10][10]
-    car2darray = [[[{'num': '', 'exist': ''} for i in range(10)] for j in range(10)] for k in range(3)]
-
-    for spot in currentlot:
-        # spotnames that start with A, C, E take the first half of the area
-        # spotnames that start with B, D, F take the other half
-        if spot.sectionno[0] in 'ACE':
-            x = int(spot.sectionno[2])
-            y = int(spot.sectionno[1]) - 1
-        elif spot.sectionno[0] in 'BDF':
-            x = int(spot.sectionno[2])
-            y = int(spot.sectionno[1]) + 4
-        # spotnames that start with A, B --> car2darray[0]
-        # spotnames that start with C, D --> car2darray[1]
-        # spotnames that start with E, F --> car2darray[2]
-        if spot.sectionno[0] in 'AB':
-            car2darray[0][x][y] = {'num': spot.sectionno, 'exist': color(spot.currexist)}
-        elif spot.sectionno[0] in 'CD':
-            car2darray[1][x][y] = {'num': spot.sectionno, 'exist': color(spot.currexist)}
-        elif spot.sectionno[0] in 'EF':
-            car2darray[2][x][y] = {'num': spot.sectionno, 'exist': color(spot.currexist)}
-
-    # line is used to add cols and rows in html output
+    # line is used to mark cols and rows that need spaces in html output
     line = ['A20', 'A40', 'B10', 'B30', 'C20', 'C40', 'D10', 'D30', 'E20', 'E40', 'F10', 'F30']
+
+    # carcount[0] --> A,B 차 개수
+    # carcount[1] --> C,D 차 개수
+    # carcount[2] --> E,F 차 개수
+    carcount = [visual.carcount(x) for x in range(1, 4)]
 
     context = {
         'title': '주차장 현황',
         'car2darray': car2darray,
-        'line': line
+        'line': line,
+        'form': FlightSearch(),
+        'carcount': carcount,
+        'show': show    # 사용자 검색에서 주차된 차량의 자리 링크를 선택하면 자리(str)가 show로 전달된다.
     }
+
+    if request.method == 'POST':
+        form = FlightSearch(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data.get('searched_flight')
+            context['recommend'] = recommend.Induce(data)
+            context['flight'] = data
+            context['gate'] = recommend.Get_Gate_no(data)
+
     return render(request, 'parkinglist/index.html', context)
 
 def get_search(request):
@@ -55,9 +44,10 @@ def get_search(request):
             data = form.cleaned_data.get('searched_car')
             car = Parkinglot.objects.filter(carno=data)
             # update cost if car exists
+            # 추후 통합시 반드시 수정할것***
             for x in car:
                 if x.currexist == 1:
-                    x.cost = calculate(x.parkingtime)
+                    x.cost = calculate.calculate(x.parkingtime)
                     x.save()
             return render(request, 'parkinglist/detail.html', {'car' : car})
     else:
@@ -110,7 +100,7 @@ def adv_search(request):
             # update cost if car exists
             for x in car:
                 if x.currexist == 1:
-                    x.cost = calculate(x.parkingtime)
+                    x.cost = calculate.calculate(x.parkingtime)
                     x.save()
 
             context = {
@@ -121,3 +111,73 @@ def adv_search(request):
     else:
         form = AdvSearchForm()
         return render(request, 'parkinglist/adv_search.html', {'form' : form})
+
+def check_car(request):
+    if request.method == 'POST':
+        visual.delete_overTime()
+    context = {
+        'car': visual.check_overTime()
+    }
+    return render(request, 'parkinglist/check.html', context)
+
+def get_records(request, page):
+    start = (page - 1) // 10 * 10 + 1
+    end = start + 10
+    totalpagecount = visual.count_records() // 10 + 1
+    display = [i for i in range(start, end)]
+    context = {
+        'car': visual.show_records((page - 1) * 10, page * 10 - 1),
+        'display': display,
+        'totalpagecount': totalpagecount
+    }
+    return render(request, 'parkinglist/records.html', context)
+
+def statistics(request):
+    if request.method == 'POST':
+        form = StatsForm(request.POST)
+        if form.is_valid():
+            type_stats = form.cleaned_data.get('type_stats')
+            datetime_start = form.cleaned_data.get('datetime_start')
+            datetime_end = form.cleaned_data.get('datetime_end')
+            if datetime_start == None:
+                datetime_start = ''
+            if datetime_end == None:
+                datetime_end = ''
+
+            if type_stats == '1':
+                context = {
+                    'title': '매출 통계',
+                    'tabletitle': ['총액', '평균 금액'],
+                    'data': stats.sale_stats(datetime_start,datetime_end)
+                    }
+            elif type_stats == '2':
+                context = {
+                    'title': '차량 통계',
+                    'tabletitle': ['차량 번호', '주차장 이용 횟수', '총액', '평균 금액'],
+                    'data': stats.car_stats(datetime_start,datetime_end)
+                    }
+            elif type_stats == '3':
+                data = stats.section_stats(datetime_start,datetime_end)
+                # list의 None을 0으로 변환
+                data = [0 if x == None else x for x in data]
+                # list에서 3개씩 골라 tuple로 묶은 후, tuple의 list로 변환
+                data = [(chr((i // 2) + 65), data[i], data[i + 1]) for i in range(0, 10, 2)]
+                
+                context = {
+                    'title': '구역 통계',
+                    'tabletitle': ['구역', '총 이용 차량 수', '총액'],
+                    'data': data
+                    }
+            elif type_stats == '4':
+                context = {
+                    'title': '고객 통계',
+                    'tabletitle': ['총 고객 수', '총액', '총 일반 고객 수', '일반 고객 총 요금', '총 회원 고객 수', '회원 고객 총 요금'],
+                    'data': stats.user_stats(datetime_start,datetime_end)
+                    }
+            else:
+                return False
+            if not context: context = '조건에 일치하는 통계 자료가 없습니다.'  #자료가 없다.
+            return render(request, 'parkinglist/stats_display.html', context)
+    else:
+        form = StatsForm()
+        return render(request, 'parkinglist/stats.html', {'form' : form})

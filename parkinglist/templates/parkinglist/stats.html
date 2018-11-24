@@ -2,9 +2,9 @@
 
 {% block content %}
     <form method="post">
-        <label>차를 검색하세요</label>
+        <label>통계유형과 기간을 선택하세요</label>
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="검색" class="w3-button w3-light-grey">
+        <input type="submit" value="조회" class="w3-button w3-light-grey">
     </form>
 {% endblock %}

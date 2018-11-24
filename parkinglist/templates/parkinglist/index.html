@@ -1,18 +1,31 @@
 {% extends 'parkinglist/layout.html' %}
 
 {% block content %}
+<div class="w3-center w3-cell-row" style="margin-top:100px">
     {% for x in car2darray %}
-    <table style="display:inline; padding:50px">
-        <caption>구역 {{ forloop.counter }}</caption>
+    <table class="w3-table-all w3-tiny" style="display:inline; margin:30px">
+        <caption class="w3-medium"><b>구역 {{ forloop.counter }}</b></caption>
         {% for y in x %}
             <tr>
                 {% for z in y %}
-                    <td style="background-color:{{ z.exist }}">
-                        {{z.num}}
-                    </td>
-                    {% if z.num in line %}
-                        <td rowspan="11" style="padding: 10px;"></td>
+                
+                {% if z.num == recommend %}
+                <td class="w3-green">{{ z.num }}</td>
+
+                {% elif z.num == show %}
+                <td class="w3-red">{{ z.num }}</td>
+
+                {% else %}
+                    {% if z.exist == 1 %}
+                    <td class="w3-black">{{ z.num }}</td>
+                    {% else %}
+                    <td class="w3-grey">{{ z.num }}</td>
                     {% endif %}
+                {% endif %}
+                
+                {% if z.num in line %}
+                    <td rowspan="11" style="padding: 10px;"></td>
+                {% endif %}
                 {% endfor %}
             </tr>
             {% if forloop.counter == 5 %}
@@ -23,5 +36,28 @@
         {% endfor %}
     </table>
     {% endfor %}
-    
+</div>
+
+<div class="w3-cell-row" style="margin-top:50px;margin-left:100px; margin-bottom:100px">
+    <form class="w3-padding-large" method="post">
+        <label>비행편</label>
+        <br><br>
+        {% csrf_token %}
+        {{form}}
+        <br><br>
+        <input class="w3-button w3-light-grey" type="submit" value="자리 추천"></button>
+    </form>
+    {% if recommend %}
+    <div class="w3-padding-large">
+        <p>검색된 비행편: {{flight}}</p>
+        <p>해당 비행편 게이트: {{gate}}</p>
+        <p>추천된 자리: <b class="w3-green w3-padding">{{recommend}}</b></p>
+    </p>
+    {% endif %}
+    <div class="w3-padding-large">
+        {% for x in carcount %}
+        <p>구역 {{forloop.counter}}: {{x}} / 100</p>
+        {% endfor %}
+    </p>
+</div>
 {% endblock %}

@@ -21,3 +21,10 @@ handlers:
 - url: /.*
   script: auto
 # [END django_app]
+
+env_variables:
+  # Replace USER, PASSWORD, DATABASE, and CONNECTION_NAME with the
+  # values obtained when configuring your Cloud SQL instance.
+  MYSQL_DSN: mysql:unix_socket=/cloudsql/dev-airlock-218215:asia-east1;dbname=software7
+  MYSQL_USER: root
+  MYSQL_PASSWORD: 2018

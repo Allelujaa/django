@@ -1,8 +1,11 @@
 from django import forms
 import datetime
 
+class FlightSearch(forms.Form):
+    searched_flight = forms.CharField(label='', max_length=10)
+
 class SearchForm(forms.Form):
-    searched_car = forms.CharField(label='차를 검색하세요', max_length=10)
+    searched_car = forms.CharField(label='', max_length=10)
 
 class AdvSearchForm(forms.Form):
     searched_car = forms.CharField(label='차 번호', max_length=20, required=False)
@@ -18,3 +21,13 @@ class AdvSearchForm(forms.Form):
         (1, '있음'),
         (0, '없음')
     ))
+
+class StatsForm(forms.Form):
+    type_stats = forms.ChoiceField(label='통계유형', required=True, widget=forms.Select(), choices=(
+        ('1', '매출'),
+        ('2', '차량'),
+        ('3', '구역'),
+        ('4', '고객')
+    ))
+    datetime_start = forms.DateTimeField(label='기간(부터)', required=False, input_formats=['%Y-%m-%d %H:%M:%S'], initial='2018-12-31 23:59:59')
+    datetime_end = forms.DateTimeField(label='기간(까지)', required=False, input_formats=['%Y-%m-%d %H:%M:%S'], initial='2018-12-31 23:59:59')

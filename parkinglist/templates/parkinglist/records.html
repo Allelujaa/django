@@ -1,0 +1,39 @@
+{% extends 'parkinglist/layout2.html' %}
+
+{% block content %}
+<b>
+    차량기록
+</b>
+<br><br>
+<table class="w3-table w3-bordered">
+    <tr>
+        <th>차량번호</th>
+        <th>출입</th>
+        <th>퇴장</th>
+        <th>요금</th>
+        <th>현재유무</th>
+        <th>주차자리</th>
+    </tr>
+    {% for car_searched in car %}
+    {% if car_searched.currexist == 1 %}
+    <tr style="color:red">
+    {% else %}
+    <tr>
+    {% endif %}
+        {% for idx in car_searched %}
+        <td>{{idx}}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+<br><br>
+{% for x in display %}
+{% if x < totalpagecount %}
+<a class="w3-button" href="/parkinglist/records/{{x}}">{{x}}</a>
+{% endif %}
+{% if forloop.counter == 10 and x < totalpagecount %}
+<a class="w3-button" href="/parkinglist/records/{{display.0|add:'10'}}">>></a>
+{% endif %}
+{% endfor %}
+
+{% endblock %}
