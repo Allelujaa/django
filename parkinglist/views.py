@@ -6,6 +6,7 @@ from django.views.generic.edit import CreateView
 from django.db.models import Q
 import datetime
 from . import calculate, recommend, visual, stats
+from django.contrib.auth.decorators import login_required
 
 def index(request, show='default'):
     car2darray = visual.visualize()
@@ -54,6 +55,7 @@ def get_search(request):
         form = SearchForm()
         return render(request, 'parkinglist/search.html', {'form' : form})
 
+@login_required(login_url='/admin/login')
 def adv_search(request):
     if request.method == 'POST':
         form = AdvSearchForm(request.POST)
@@ -112,6 +114,7 @@ def adv_search(request):
         form = AdvSearchForm()
         return render(request, 'parkinglist/adv_search.html', {'form' : form})
 
+@login_required(login_url='/admin/login')
 def check_car(request):
     if request.method == 'POST':
         visual.delete_overTime()
@@ -120,6 +123,7 @@ def check_car(request):
     }
     return render(request, 'parkinglist/check.html', context)
 
+@login_required(login_url='/admin/login')
 def get_records(request, page):
     start = (page - 1) // 10 * 10 + 1
     end = start + 10
@@ -132,6 +136,7 @@ def get_records(request, page):
     }
     return render(request, 'parkinglist/records.html', context)
 
+@login_required(login_url='/admin/login')
 def statistics(request):
     if request.method == 'POST':
         form = StatsForm(request.POST)

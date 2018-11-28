@@ -95,7 +95,7 @@ DATABASES = {
     }
 }
 
-DATABASES['default']['HOST'] = '/cloudsql/dev-airlock-218215:asia-east1:software7'
+DATABASES['default']['HOST'] = '/cloudsql/parkingsystem-221809:asia-east1:software7'
 
 if os.getenv('GAE_INSTANCE'):
     pass
