@@ -1,1 +1,4 @@
 *.yaml
+requirements.txt
+settings.py
+settings(backup).py

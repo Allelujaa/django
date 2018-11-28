@@ -2,8 +2,10 @@ import pymysql
 import datetime
 from dateutil.relativedelta import *
 from django.db.models import Q
+import os
+from . import connector
 
-conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
+conn = connector.con()
 cursor = conn.cursor()
 
 # visualize()는 현재 주차장을 표시한 2d 배열을 반환합니다.
@@ -40,6 +42,7 @@ def visualize():
         elif spot[0][0] in 'EF':
             car2darray[2][x][y] = {'num': spot[0], 'exist': spot[2]}
     
+    
     return car2darray
 
 # carcount(area)는 현재 주차장 area에 있는 차량의 개수를 반환합니다.
@@ -57,18 +60,21 @@ def carcount(area):
     
     count = cursor.execute(sql, val[0])
     count += cursor.execute(sql, val[1])
+    
     return count
 
 # show_records(start, until)는 parkinglot에서 start번부터 until번 row를 tuple 형태로 반환합니다.
 def show_records(start, until):
     sql = "SELECT * from parkinglot limit %s, %s"
     cursor.execute(sql, (start, until))
+    
     return cursor.fetchall()
 
 # count_records()는 parkinglot의 row 개수를 반환합니다.
 def count_records():
     sql = 'SELECT * FROM parkinglot'
     count = cursor.execute(sql)
+    
     return count
 
 # check_overTime()은 주차한지 1년이상 됐으며 퇴장하지 않은 차의 정보를 tuple 형태로 반환합니다.
@@ -76,6 +82,7 @@ def check_overTime():
     year_before = datetime.datetime.now() - relativedelta(years=1)
     sql = "SELECT carNo from parkinglot where currExist = 1 and parkingTime<=%s"
     cursor.execute(sql, year_before)
+    
     return cursor.fetchall()
 
 # delete_overTime()은 check_overTime()에서 확인된 차량들을 
@@ -89,6 +96,7 @@ def delete_overTime():
         cursor.execute(sql, (0, None, idx[0]))
         cursor.execute(sql2, (0, idx[0]))
     conn.commit()
+    
 
 # advanced_search()는 특수검색을 위한 q object를 반환합니다.
 def advanced_search():
