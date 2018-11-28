@@ -4,7 +4,7 @@ env: flex
 entrypoint: gunicorn -b :$PORT djangoproject.wsgi
 
 beta_settings:
-  cloud_sql_instances: dev-airlock-218215:asia-east1:software7
+  cloud_sql_instances: parkingsystem-221809:asia-east1:software7
 
 runtime_config:
   python_version: 3
@@ -25,6 +25,8 @@ handlers:
 env_variables:
   # Replace USER, PASSWORD, DATABASE, and CONNECTION_NAME with the
   # values obtained when configuring your Cloud SQL instance.
-  MYSQL_DSN: mysql:unix_socket=/cloudsql/dev-airlock-218215:asia-east1;dbname=software7
-  MYSQL_USER: root
-  MYSQL_PASSWORD: 2018
+  CLOUD_SQL_CONNECTION_NAME: 'parkingsystem-221809:asia-east1:software7'
+  CLOUD_SQL_USER_NAME: 'root'
+  CLOUD_SQL_PASSWORD: '2018'
+  CLOUD_SQL_DATABASE_NAME: 'project7'
+  CHECK_INSTANCE: 'GAE'

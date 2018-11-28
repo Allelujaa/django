@@ -1,10 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
 import pymysql
+import os
+from . import connector
 
 html = requests.get('https://www.airport.co.kr/gimpo/extra/liveSchedule/liveScheduleList/layOut.do?langType=1&inoutType=OUT&cid=2015102611043202364&menuId=8').text
 soup = BeautifulSoup(html, 'html.parser')
-conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
+
+conn = connector.con()
 cursor = conn.cursor()
 
 

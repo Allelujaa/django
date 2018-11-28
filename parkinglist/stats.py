@@ -1,8 +1,10 @@
 from django.db.models import Q
 import datetime
 import pymysql
+import os
+from . import connector
 
-conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
+conn = connector.con()
 cursor = conn.cursor()
 
 #매출: 총액, 평균 리턴
@@ -19,6 +21,7 @@ def sale_stats(datetime_start,datetime_end):
             sql = "SELECT sum(cost), avg(cost) FROM parkinglot WHERE (exitTime BETWEEN '%s' AND '%s')"%(datetime_start, datetime_end)
     cursor.execute(sql)
     data = cursor.fetchall()
+    
     return data
 
 #차량 통계: 차량별 주차장 이용횟수, 총금액, 평균 금액
@@ -35,6 +38,7 @@ def car_stats(datetime_start,datetime_end):
             sql = "SELECT carNo,count(*),sum(cost),avg(cost) FROM parkinglot WHERE (exitTime BETWEEN '%s' AND '%s') GROUP BY carNo"%(datetime_start, datetime_end)
     cursor.execute(sql)
     data = cursor.fetchall()
+    
     return data
 
 #구역 통계: 구역별 총 차량 수, 총 금액 리턴
@@ -67,6 +71,7 @@ def section_stats(datetime_start,datetime_end):
                 cursor.execute(sql)
                 for row in cursor:
                     data_list.append(row[0]), data_list.append(row[1])
+    
     return data_list
 
     
@@ -100,5 +105,6 @@ def user_stats(datetime_start,datetime_end):
             SELECT count(*), sum(cost) FROM parkinglot p, client c WHERE p.carNo = c.carNo and (exitTime BETWEEN '%s' AND '%s')"""%(datetime_start, datetime_end, datetime_start, datetime_end, datetime_start, datetime_end)
     cursor.execute(sql)
     data = cursor.fetchall()
+    
     return data
 

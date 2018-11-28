@@ -91,13 +91,12 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '2018',
         'NAME': 'project7',
-        'PORT': '3306',
+        'PORT': 3306,
+        'HOST': '/cloudsql/parkingsystem-221809:asia-east1:software7'
     }
 }
 
-DATABASES['default']['HOST'] = '/cloudsql/parkingsystem-221809:asia-east1:software7'
-
-if os.getenv('GAE_INSTANCE'):
+if os.environ.get('CHECK_INSTANCE'):
     pass
 else:
     DATABASES['default']['HOST'] = '127.0.0.1'
@@ -141,4 +140,5 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_ROOT = 'static'
-STATIC_URL = '/static/'
+STATIC_URL = 'https://storage.googleapis.com/parkingsystem_static/static/'
+

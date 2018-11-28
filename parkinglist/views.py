@@ -97,9 +97,13 @@ def adv_search(request):
 
             if exists != '':   #현재 유무 조건 있을 때
                 q &= Q(currexist=int(exists))
+            
+            car = Parkinglot.objects.filter(q)
+                # 추후에 primary key인 자동생성 id column이 필요
+                # 지금은 model.Parkinglot.carNo로 조회하기때문에 중복차량은 안나올수도 있음
+            # if car.exists() == False:
+            #     raise Http404('No records available')
 
-            car = Parkinglot.objects.filter(q)   #필터링
-            # update cost if car exists
             for x in car:
                 if x.currexist == 1:
                     x.cost = calculate.calculate(x.parkingtime)
@@ -109,6 +113,8 @@ def adv_search(request):
                 'car': car
             }
             return render(request, 'parkinglist/detail.html', context)
+            
+            
         
     else:
         form = AdvSearchForm()
