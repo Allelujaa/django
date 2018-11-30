@@ -8,7 +8,7 @@ class SearchForm(forms.Form):
     searched_car = forms.CharField(label='', max_length=10)
 
 class AdvSearchForm(forms.Form):
-    searched_car = forms.CharField(label='차 번호', max_length=20, required=False)
+    searched_car = forms.CharField(label='차 번호', max_length=10, required=False)
     in_datetime_start = forms.DateTimeField(label='입장일시(부터)', required=False, input_formats=['%Y-%m-%d %H:%M:%S'], initial='2018-12-31 23:59:59')
     in_datetime_end = forms.DateTimeField(label='입장일시(까지)', required=False, input_formats=['%Y-%m-%d %H:%M:%S'], initial='2018-12-31 23:59:59')
     out_datetime_start = forms.DateTimeField(label='퇴장일시(부터)', required=False, input_formats=['%Y-%m-%d %H:%M:%S'], initial='2018-12-31 23:59:59')
@@ -31,3 +31,10 @@ class StatsForm(forms.Form):
     ))
     datetime_start = forms.DateTimeField(label='기간(부터)', required=False, input_formats=['%Y-%m-%d %H:%M:%S'], initial='2018-12-31 23:59:59')
     datetime_end = forms.DateTimeField(label='기간(까지)', required=False, input_formats=['%Y-%m-%d %H:%M:%S'], initial='2018-12-31 23:59:59')
+
+class EnterForm(forms.Form):
+    carno = forms.CharField(label='차 번호', max_length=10)
+    inout = forms.ChoiceField(label='입장/퇴장', widget=forms.Select(), choices=(
+        (0, '입장'),
+        (1, '퇴장')
+    ))
