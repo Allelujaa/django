@@ -99,7 +99,17 @@ def delete_overTime():
     
 
 # advanced_search()는 특수검색을 위한 q object를 반환합니다.
-def advanced_search():
+def advanced_search(
+    cardata='',
+    in_datetime_start=None,
+    in_datetime_end=None,
+    out_datetime_start=None,
+    out_datetime_end=None,
+    cost_min=None,
+    cost_max=None,
+    sectionno='',
+    exists=''
+    ):
     q = Q()
     if cardata != '': #차량번호 조건 있을 때
         q &= Q(carno=cardata)

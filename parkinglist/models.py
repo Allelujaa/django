@@ -89,7 +89,7 @@ class Client(models.Model):
 
 class Currparkinglot(models.Model):
     sectionno = models.CharField(db_column='sectionNo', primary_key=True, max_length=10)  # Field name made lowercase.
-    carno = models.CharField(db_column='carNo', max_length=10, null=True)  # Field name made lowercase.
+    carno = models.CharField(db_column='carNo', max_length=10, null=True, blank=True)  # Field name made lowercase.
     currexist = models.IntegerField(db_column='currExist', null=True)  # Field name made lowercase.
     avalue = models.IntegerField(db_column='Aval', null=True)
     bvalue = models.IntegerField(db_column='Bval', null=True)
