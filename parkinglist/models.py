@@ -159,7 +159,8 @@ class Flight(models.Model):
         db_table = 'flight'
 
 class Parkinglot(models.Model):
-    carno = models.CharField(db_column='carNo', max_length=10, primary_key=True)  # Field name made lowercase.
+    id = models.IntegerField(db_column='id', primary_key=True, blank=True)
+    carno = models.CharField(db_column='carNo', max_length=10)  # Field name made lowercase.
     parkingtime = models.DateTimeField(db_column='parkingTime', blank=True, null=True)  # Field name made lowercase.
     exittime = models.DateTimeField(db_column='exitTime', blank=True, null=True)  # Field name made lowercase.
     cost = models.IntegerField(db_column='cost', blank=True, null=True)
@@ -171,4 +172,4 @@ class Parkinglot(models.Model):
         db_table = 'parkinglot'
     
     def __str__(self):
-        return self.carno
+        return self.carno + '/' + str(self.parkingtime)

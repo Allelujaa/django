@@ -3,8 +3,12 @@
 {% block content %}
 
 <br><br>
+{% if not car %}
+{{msg}}
+{% else %}
 <table class="w3-table w3-bordered">
     <tr>
+        <th>번호</th>
         <th>차량번호</th>
         <th>위치</th>
         <th>출입</th>
@@ -18,6 +22,7 @@
     {% else %}
     <tr>
     {% endif %}
+        <td>{{forloop.counter}}</td>
         <td>{{car_searched.carno}}</td>
         {% if car_searched.currexist == 1 %}
         <td><a href="/parkinglist/{{car_searched.sectionno}}">{{car_searched.sectionno}}</a></td>
@@ -40,4 +45,9 @@
     {% endfor %}
 </table>
 
+{% if display|last < totalpagecount %}
+<a class="w3-button" href="/parkinglist/detail/{{display.0|add:'10'}}">>></a>
+{% endif %}
+
+{% endif %}
 {% endblock %}

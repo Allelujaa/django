@@ -5,6 +5,9 @@
     {{title}}
 </b>
 <br><br>
+{% if not data or None in data.0 %}
+{{msg}}
+{% else %}
 <table class="w3-table w3-bordered">
     <tr>
         {% for x in tabletitle %}
@@ -37,5 +40,5 @@
         {% endfor %}
     {% endif %}
 </table>
-
+{% endif %}
 {% endblock %}

@@ -10,22 +10,19 @@ html = requests.get(
     'https://www.airport.co.kr/gimpo/extra/liveSchedule/liveScheduleList/layOut.do?langType=1&inoutType=OUT&cid=2015102611043202364&menuId=8').text
 soup = BeautifulSoup(html, 'html.parser')
 
-# 이 프로그램이 메인일 경우 프로그램 시작시 DB에 connect를 합니다.
-# 웹에서 import할 경우, 각 클래스 인스턴스 생성 시점에 connect를 합니다.
-if __name__ == '__main__':
-    # app engine에서 작동할 경우, unix socket으로 db에 연결합니다
-    # db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
-    if os.environ.get('CHECK_INSTANCE'):
-        db_user = os.environ.get('CLOUD_SQL_USERNAME')
-        db_password = os.environ.get('CLOUD_SQL_PASSWORD')
-        db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
-        db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
-        unix_socket = '/cloudsql/{}'.format(db_connection_name)
-        conn = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
-    # 일반 기기에서 작동할 경우, tcp socket으로 db에 연결합니다.
-    else:
-        conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
-    cursor = conn.cursor()
+# app engine에서 작동할 경우, unix socket으로 db에 연결합니다
+# db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
+if os.environ.get('CHECK_INSTANCE'):
+    db_user = os.environ.get('CLOUD_SQL_USERNAME')
+    db_password = os.environ.get('CLOUD_SQL_PASSWORD')
+    db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
+    db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
+    unix_socket = '/cloudsql/{}'.format(db_connection_name)
+    conn = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
+# 일반 기기에서 작동할 경우, tcp socket으로 db에 연결합니다.
+else:
+    conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
+cursor = conn.cursor()
 
 class car():
     def __init__(self,car_no,server):
@@ -36,30 +33,16 @@ class car():
         self.user = False
         self.sectionNo = None
 
-        # app engine에서 작동할 경우, unix socket으로 db에 연결합니다
-        # db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
-        if os.environ.get('CHECK_INSTANCE'):
-            db_user = os.environ.get('CLOUD_SQL_USERNAME')
-            db_password = os.environ.get('CLOUD_SQL_PASSWORD')
-            db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
-            db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
-            unix_socket = '/cloudsql/{}'.format(db_connection_name)
-            self.conn = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
-        # 일반 기기에서 작동할 경우, tcp socket으로 db에 연결합니다.
-        else:
-            self.conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
-        self.cursor = self.conn.cursor()
-
     def car_in(self):
         sql = "SELECT count(*) FROM currParkinglot WHERE carNo = '%s'" % self.car_no
-        self.cursor.execute(sql)
-        if (self.cursor.fetchone()[0] > 0):
+        cursor.execute(sql)
+        if (cursor.fetchone()[0] > 0):
             print("이미 주차된 차량입니다.\n")
             return 0
 
         sql = "SELECT count(*) FROM currParkinglot WHERE currExist = 0"
-        self.cursor.execute(sql)
-        if (self.cursor.fetchone()[0] <= 0):
+        cursor.execute(sql)
+        if (cursor.fetchone()[0] <= 0):
             print("만차입니다.\n")
             return 0
 
@@ -68,8 +51,8 @@ class car():
 
         # 회원일 경우
         sql = "SELECT count(*) FROM client WHERE carNo = '%s'" % self.car_no  # 회원 DB에 해당 차량 번호가 있는지 확인
-        self.cursor.execute(sql)
-        if (self.cursor.fetchone()[0] > 0):
+        cursor.execute(sql)
+        if (cursor.fetchone()[0] > 0):
             self.user = True
             self.check_inf = 'Y'
             print("회원입니다.")
@@ -88,8 +71,8 @@ class car():
         while True:
             self.sectionNo = input("(주차자리인식) ")
             sql = "SELECT count(*) FROM currParkinglot WHERE sectionNo='%s' and currExist = 0 and Aval = 6" % self.sectionNo
-            self.cursor.execute(sql)
-            if (self.cursor.fetchone()[0] <= 0):
+            cursor.execute(sql)
+            if (cursor.fetchone()[0] <= 0):
                 print("이미 주차된 자리이거나 유효하지 않은 자리입니다.")
                 continue
             else:
@@ -98,42 +81,42 @@ class car():
         print(self.sectionNo, "주차완료.")
 
         sql = "SELECT count(*) FROM currParkinglot WHERE carNo = '%s'" % self.car_no  # 이미 주차된 차량이 자리를 옮기는 경우
-        self.cursor.execute(sql)
-        if (self.cursor.fetchone()[0] > 0):
+        cursor.execute(sql)
+        if (cursor.fetchone()[0] > 0):
             sql = "UPDATE currParkinglot SET currExist = 0, carNo = null WHERE carNo = '%s'" % self.car_no
-            self.cursor.execute(sql)
-            self.conn.commit()
+            cursor.execute(sql)
+            conn.commit()
 
             sql = "UPDATE currParkinglot SET carNo = '%s', currExist = 1 WHERE sectionNo = '%s'" % (
             self.car_no, self.sectionNo)
-            self.cursor.execute(sql)
-            self.conn.commit()
+            cursor.execute(sql)
+            conn.commit()
 
             sql = "UPDATE parkinglot SET sectionNo = '%s' WHERE carNo = '%s' and currExist = 1" % (
             self.sectionNo, self.car_no)
-            self.cursor.execute(sql)
-            self.conn.commit()
+            cursor.execute(sql)
+            conn.commit()
 
         else:
             sql = """INSERT INTO
                             parkinglot(carNo, sectionNo, parkingTime, currExist)
                             VALUES(%s,%s, %s, %s)"""
-            self.cursor.execute(sql, (self.car_no, self.sectionNo, datetime.datetime.now(), 1))
-            self.conn.commit()
+            cursor.execute(sql, (self.car_no, self.sectionNo, datetime.datetime.now(), 1))
+            conn.commit()
 
             sql = """
                     UPDATE currParkinglot
                     SET carNo = %s, currExist = %s
                     WHERE sectionNo = %s
                     """
-            self.cursor.execute(sql, (self.car_no, 1, self.sectionNo))
-            self.conn.commit()
+            cursor.execute(sql, (self.car_no, 1, self.sectionNo))
+            conn.commit()
 
     # 차량 퇴장 함수 // sectionNo 정해지면 sql 문 수정
     def car_out(self):
         sql = "SELECT count(*) FROM currParkinglot WHERE carNo = '%s'" % self.car_no
-        self.cursor.execute(sql)
-        if (self.cursor.fetchone()[0] <= 0):
+        cursor.execute(sql)
+        if (cursor.fetchone()[0] <= 0):
             print("주차 기록이 없는 차량입니다.")
 
         else:
@@ -143,35 +126,19 @@ class car():
                             SET carNo = %s, currExist = %s
                             WHERE carNo = %s
                             """
-            self.cursor.execute(sql, (None, 0, self.car_no))
-            self.conn.commit()
+            cursor.execute(sql, (None, 0, self.car_no))
+            conn.commit()
 
             sql = """update parkinglot
                              set currExist = %s
                              WHERE carNo = %s and currExist = 1"""
-            self.cursor.execute(sql, (0, self.car_no))
-            self.conn.commit()
+            cursor.execute(sql, (0, self.car_no))
+            conn.commit()
 
         self.server.barr_off()
 
 
 class parkingsystem():
-    if __name__ != '__main__':
-        def __init__(self):
-            # app engine에서 작동할 경우, unix socket으로 db에 연결합니다
-            # db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
-            if os.environ.get('CHECK_INSTANCE'):
-                db_user = os.environ.get('CLOUD_SQL_USERNAME')
-                db_password = os.environ.get('CLOUD_SQL_PASSWORD')
-                db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
-                db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
-                unix_socket = '/cloudsql/{}'.format(db_connection_name)
-                self.conn = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
-            # 일반 기기에서 작동할 경우, tcp socket으로 db에 연결합니다.
-            else:
-                self.conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
-            self.cursor = self.conn.cursor()
-
     def CarEnterHandler(self):
         while True:
             print("차량번호 인식")
@@ -196,8 +163,8 @@ class parkingsystem():
         # 입장 시간 구하는 함수
     def get_enter_time(self,car_no):
         sql = "select parkingTime from parkinglot where carNo = '%s' and currExist = 1" %car_no
-        self.cursor.execute(sql)
-        time = self.cursor.fetchone()[0]   #위 select 결과 하나의 튜플만 나오는것이 정상
+        cursor.execute(sql)
+        time = cursor.fetchone()[0]   #위 select 결과 하나의 튜플만 나오는것이 정상
         return time
 
     def calculate(self,car_no,command='exit'):
@@ -231,16 +198,16 @@ class parkingsystem():
         print("사용 요금 : " + cost)
 
         sql = "UPDATE parkinglot SET cost= %s WHERE carNo = %s"
-        self.cursor.execute(sql, (int(cost), car_no))
-        self.conn.commit()
+        cursor.execute(sql, (int(cost), car_no))
+        conn.commit()
         # admin.get_search() 또는 admin.adv_search에서 calculate()를 호출시, command를 'search'로 전달하여 exitTime 업데이트를 하지 않습니다.
         if command == 'search':
             pass
         # car.car_out()에서 호출할 경우, command는 기본값인 'exit'을 가지고, exitTime을 업데이트합니다.
         else:
             sql = "UPDATE parkinglot SET exitTime = %s, currExist = 0 WHERE carNo = %s"   #계산할 때의 현재시간으로 퇴장시간 저장(예외케이스 고려)
-            self.cursor.execute(sql, (time_now, car_no))
-            self.conn.commit()
+            cursor.execute(sql, (time_now, car_no))
+            conn.commit()
 
     def Get_Gate_no(self,flight_no):
         Counter = 0
@@ -260,8 +227,8 @@ class parkingsystem():
         if (gate == None) or (gate == ''):
             print("a")
             sql = "SELECT sectionNo FROM currParkinglot WHERE currExist = 0 order by rand()"
-            self.cursor.execute(sql)
-            return (self.cursor.fetchone()[0])
+            cursor.execute(sql)
+            return (cursor.fetchone()[0])
         else:
             gate = int(gate)
 
@@ -281,36 +248,20 @@ class parkingsystem():
             Counter = 6
             while Counter >= 1:
                 sql = "SELECT sectionNo FROM currParkinglot WHERE %s = %s and currExist = 0" % (val, Counter)
-                if self.cursor.execute(sql):
-                    return (self.cursor.fetchone()[0])
+                if cursor.execute(sql):
+                    return (cursor.fetchone()[0])
                 else:
                     Counter -= 1
 
 class admin():
-    if __name__ != '__main__':
-        def __init__(self):
-            # app engine에서 작동할 경우, unix socket으로 db에 연결합니다
-            # db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
-            if os.environ.get('CHECK_INSTANCE'):
-                db_user = os.environ.get('CLOUD_SQL_USERNAME')
-                db_password = os.environ.get('CLOUD_SQL_PASSWORD')
-                db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
-                db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
-                unix_socket = '/cloudsql/{}'.format(db_connection_name)
-                self.conn = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
-            # 일반 기기에서 작동할 경우, tcp socket으로 db에 연결합니다.
-            else:
-                self.conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
-            self.cursor = self.conn.cursor()
-        
     # check_overTime()은 parkinglot에서 현재 주차된 차 중 1년이 지난 차를 tuple 형태로 반환합니다.
     def check_overTime(self):
         year_before = datetime.datetime.now() - relativedelta(years=1)
         print(year_before)
 
         sql = "SELECT carNo from parkinglot where currExist = 1 and parkingTime<=%s"
-        self.cursor.execute(sql, year_before)
-        data = self.cursor.fetchall()
+        cursor.execute(sql, year_before)
+        data = cursor.fetchall()
         print(data)
         return data
     
@@ -324,9 +275,9 @@ class admin():
             for idx in self.check_overTime():
                 sql = "UPDATE currParkinglot set currExist = %s, carNo = %s where carNo = %s"
                 sql2 = "UPDATE parkinglot set currExist = %s, exitTime = %s where carNo = %s"
-                self.cursor.execute(sql, (0, None, idx[0]))
-                count = self.cursor.execute(sql2, (0, datetime.datetime.now(), idx[0]))
-            self.conn.commit()
+                cursor.execute(sql, (0, None, idx[0]))
+                count = cursor.execute(sql2, (0, datetime.datetime.now(), idx[0]))
+            conn.commit()
             return count
         except self.check_overTime() == None:
             return 0
@@ -336,8 +287,8 @@ class admin():
     # 배열은 3(구역)x10(행)x10(열) 이고, 데이터는 'num', 'exist'으로 구성된 dictionary입니다.
     def visualize(self):
         sql = 'SELECT sectionNo, carNo, currExist FROM currParkinglot'
-        self.cursor.execute(sql)
-        currentlot = self.cursor.fetchall()
+        cursor.execute(sql)
+        currentlot = cursor.fetchall()
         # for spot in currentlot
         # spot[0] --> sectionNo
         # spot[1] --> carNo
@@ -383,22 +334,22 @@ class admin():
             return False
         sql = 'SELECT * FROM currParkinglot WHERE currExist = ''1'' AND sectionNo LIKE %s'
         
-        count = self.cursor.execute(sql, val[0])
-        count += self.cursor.execute(sql, val[1])
+        count = cursor.execute(sql, val[0])
+        count += cursor.execute(sql, val[1])
         
         return count
 
     # show_records(start, until)는 parkinglot에서 start번부터 until번 row를 tuple 형태로 반환합니다.
     def show_records(self, start, until):
         sql = "SELECT * from parkinglot limit %s, %s"
-        self.cursor.execute(sql, (start, until))
+        cursor.execute(sql, (start, until))
         
-        return self.cursor.fetchall()
+        return cursor.fetchall()
 
     # count_records()는 parkinglot의 row 개수를 반환합니다.
     def count_records(self):
         sql = 'SELECT * FROM parkinglot'
-        count = self.cursor.execute(sql)
+        count = cursor.execute(sql)
         
         return count
 
@@ -457,8 +408,8 @@ class admin():
                 sql = "SELECT sum(cost), avg(cost) FROM parkinglot WHERE exitTime>='%s'"%datetime_start
             else:    #시작, 끝 둘다 있음
                 sql = "SELECT sum(cost), avg(cost) FROM parkinglot WHERE (exitTime BETWEEN '%s' AND '%s')"%(datetime_start, datetime_end)
-        self.cursor.execute(sql)
-        data = self.cursor.fetchall()
+        cursor.execute(sql)
+        data = cursor.fetchall()
         
         return data
 
@@ -474,8 +425,8 @@ class admin():
                 sql = "SELECT carNo,count(*),sum(cost),avg(cost) FROM parkinglot WHERE exitTime>='%s' GROUP BY carNo"%datetime_start
             else:    #시작, 끝 둘다 있음
                 sql = "SELECT carNo,count(*),sum(cost),avg(cost) FROM parkinglot WHERE (exitTime BETWEEN '%s' AND '%s') GROUP BY carNo"%(datetime_start, datetime_end)
-        self.cursor.execute(sql)
-        data = self.cursor.fetchall()
+        cursor.execute(sql)
+        data = cursor.fetchall()
         
         return data
 
@@ -487,27 +438,27 @@ class admin():
             if datetime_end=='':  #시작, 끝 모두 없음
                 for section in section_list:
                     sql = "SELECT count(*),sum(cost) FROM parkinglot WHERE exitTime IS NOT NULL and sectionNo LIKE '%s'"%section
-                    self.cursor.execute(sql)
-                    for row in self.cursor:
+                    cursor.execute(sql)
+                    for row in cursor:
                         data_list.append(row[0]), data_list.append(row[1])
             else:    #끝 있음
                 for section in section_list:
                     sql = "SELECT count(*),sum(cost) FROM parkinglot WHERE exitTime<='%s' and sectionNo LIKE '%s'"%(datetime_end,section)
-                    self.cursor.execute(sql)
-                    for row in self.cursor:
+                    cursor.execute(sql)
+                    for row in cursor:
                         data_list.append(row[0]), data_list.append(row[1])  
         else:
             if datetime_end=='':  #시작 있음
                 for section in section_list:
                     sql = "SELECT count(*),sum(cost) FROM parkinglot WHERE exitTime>='%s' and sectionNo LIKE '%s'"%(datetime_start,section)
-                    self.cursor.execute(sql)
-                    for row in self.cursor:
+                    cursor.execute(sql)
+                    for row in cursor:
                         data_list.append(row[0]), data_list.append(row[1])
             else:    #시작, 끝 둘다 있음
                 for section in section_list:
                     sql = "SELECT count(*),sum(cost) FROM parkinglot WHERE (exitTime BETWEEN '%s' AND '%s') and sectionNo LIKE '%s'"%(datetime_start, datetime_end, section)
-                    self.cursor.execute(sql)
-                    for row in self.cursor:
+                    cursor.execute(sql)
+                    for row in cursor:
                         data_list.append(row[0]), data_list.append(row[1])
         
         return data_list
@@ -541,12 +492,12 @@ class admin():
                 SELECT count(*), sum(cost) FROM parkinglot WHERE carNo not in (SELECT distinct carNo FROM client) and (exitTime BETWEEN '%s' AND '%s')
                 union all
                 SELECT count(*), sum(cost) FROM parkinglot p, client c WHERE p.carNo = c.carNo and (exitTime BETWEEN '%s' AND '%s')"""%(datetime_start, datetime_end, datetime_start, datetime_end, datetime_start, datetime_end)
-        self.cursor.execute(sql)
-        data = self.cursor.fetchall()
+        cursor.execute(sql)
+        data = cursor.fetchall()
         
         return data
 
 
-# system = parkingsystem()
-# # system.CarExitHandler()
+system = parkingsystem()
+system.CarExitHandler()
 # system.CarEnterHandler()
