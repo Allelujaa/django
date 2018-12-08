@@ -3,13 +3,15 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from .models import Currparkinglot, Parkinglot
 from .forms import FlightSearch, SearchForm, AdvSearchForm, StatsForm
 from django.views.generic.edit import CreateView
-from .parkfunctions import admin, parkingsystem
+from .parkfunctions import admin as adm
+from .parkfunctions import parkingsystem as parksys
 from django.contrib.auth.decorators import login_required
 
-admin = admin()
-parkingsystem = parkingsystem()
 
 def index(request, show='default'):
+    admin = adm()
+    parkingsystem = parksys()
+
     car2darray = admin.visualize()
 
     # line is used to mark cols and rows that need spaces in html output
@@ -36,10 +38,17 @@ def index(request, show='default'):
             context['recommend'] = parkingsystem.Induce(flightNo)
             context['flight'] = flightNo
             context['gate'] = parkingsystem.Get_Gate_no(flightNo)
+    
+    admin.conn.close()
+    parkingsystem.conn.close()
+    del admin, parkingsystem
 
     return render(request, 'parkinglist/index.html', context)
 
 def get_search(request):
+    admin = adm()
+    parkingsystem = parksys()
+
     if request.method == 'POST':
         form = SearchForm(request.POST)
         if form.is_valid():
@@ -48,13 +57,26 @@ def get_search(request):
             for x in car:
                 if x.currexist == 1:
                     parkingsystem.calculate(x.carno, command='search')
+            
+            admin.conn.close()
+            parkingsystem.conn.close()
+            del admin, parkingsystem
+
             return render(request, 'parkinglist/detail.html', {'car': car})
     else:
         form = SearchForm()
+
+        admin.conn.close()
+        parkingsystem.conn.close()
+        del admin, parkingsystem
+
         return render(request, 'parkinglist/search.html', {'form' : form})
 
 @login_required(login_url='/admin/login')
 def adv_search(request):
+    admin = adm()
+    parkingsystem = parksys()
+
     if request.method == 'POST':
         form = AdvSearchForm(request.POST)
         if form.is_valid():
@@ -72,46 +94,93 @@ def adv_search(request):
             )
             
             car = Parkinglot.objects.filter(q)
-                # 추후에 primary key인 자동생성 id column이 필요
-                # 지금은 model.Parkinglot.carNo로 조회하기때문에 중복차량은 안나올수도 있음
 
-            for x in car:
-                if x.currexist == 1:
-                    parkingsystem.calculate(x.carno)
-
+            if not car:
+                context = {
+                    'msg': '일치하는 데이터가 없습니다.'
+                }
+            else:
+                for x in car:
+                    if x.currexist == 1:
+                        parkingsystem.calculate(x.carno, command='search')
+                context = {
+                    'car': car,
+                }
+        
+        else:
             context = {
-                'car': car
+                'msg': '제출한 양식이 올바르지 않습니다.'
             }
-            return render(request, 'parkinglist/detail.html', context)
+
+        admin.conn.close()
+        parkingsystem.conn.close()
+        del admin, parkingsystem
+        return render(request, 'parkinglist/detail.html', context)
+            
             
     else:
         form = AdvSearchForm()
+
+        admin.conn.close()
+        parkingsystem.conn.close()
+        del admin, parkingsystem
+
         return render(request, 'parkinglist/adv_search.html', {'form' : form})
 
 @login_required(login_url='/admin/login')
 def check_car(request):
+    admin = adm()
+    parkingsystem = parksys()
+
     if request.method == 'POST':
         admin.delete_overTime()
+    
+    car = admin.check_overTime()
+    
     context = {
-        'car': admin.check_overTime()
+        'car': car
     }
+
+    admin.conn.close()
+    parkingsystem.conn.close()
+    del admin, parkingsystem
+
     return render(request, 'parkinglist/check.html', context)
 
 @login_required(login_url='/admin/login')
 def get_records(request, page):
+    admin = adm()
+    parkingsystem = parksys()
+
     start = (page - 1) // 10 * 10 + 1
     end = start + 10
-    totalpagecount = admin.count_records() // 10 + 1
+    totalpagecount = (admin.count_records() - 1) // 10 + 1
+    # display must be updated for flexible page display
     display = [i for i in range(start, end)]
+    car = admin.show_records(page * 10 - 10, 10)
+
+    for x in car:
+        if x[4] == 1: 
+            parkingsystem.calculate(x[0], command='search')
+
     context = {
-        'car': admin.show_records((page - 1) * 10, page * 10 - 1),
+        'car': car,
         'display': display,
-        'totalpagecount': totalpagecount
+        'totalpagecount': totalpagecount,
+        'page': page
     }
+
+    admin.conn.close()
+    parkingsystem.conn.close()
+    del admin, parkingsystem
+
     return render(request, 'parkinglist/records.html', context)
 
 @login_required(login_url='/admin/login')
 def statistics(request):
+    admin = adm()
+    parkingsystem = parksys()
+
     if request.method == 'POST':
         form = StatsForm(request.POST)
         if form.is_valid():
@@ -155,22 +224,27 @@ def statistics(request):
                     'data': admin.user_stats(datetime_start,datetime_end)
                     }
             else:
-                return False
-            return render(request, 'parkinglist/stats_display.html', context)
+                admin.conn.close()
+                parkingsystem.conn.close()
+                del admin, parkingsystem
+                raise Http404('잘못된 접근입니다')
+
+            admin.conn.close()
+            parkingsystem.conn.close()
+            del admin, parkingsystem
+
+            context['msg'] = '데이터가 없습니다.'
+            
+        else:
+            context = {
+                'msg': '제출한 양식이 올바르지 않습니다.'
+            }
+        return render(request, 'parkinglist/stats_display.html', context)
     else:
         form = StatsForm()
-        return render(request, 'parkinglist/stats.html', {'form' : form})
+        
+        admin.conn.close()
+        parkingsystem.conn.close()
+        del admin, parkingsystem
 
-def enter(request):
-    if request.method == 'POST':
-        form = EnterForm(request.POST)
-        if form.is_valid():
-            carno = form.cleaned_data.get('carno')
-            if form.cleaned_data.get('inout') == 0: #입장
-                parkingsystem.CarEnterHandler(carno=carno)
-                
-            
-            return render(request, 'parkinglist/detail.html', {'car': car})
-    else:
-        form = SearchForm()
-        return render(request, 'parkinglist/search.html', {'form' : form})
+        return render(request, 'parkinglist/stats.html', {'form' : form})

@@ -5,6 +5,9 @@
     차량기록
 </b>
 <br><br>
+{% if not car %}
+<p>데이터 없음</p>
+{% else %}
 <table class="w3-table w3-bordered">
     <tr>
         <th>차량번호</th>
@@ -21,19 +24,44 @@
     <tr>
     {% endif %}
         {% for idx in car_searched %}
-        <td>{{idx}}</td>
+            <!--현재유무-->
+            {% if forloop.counter == 5 %}
+                {% if idx == 0 %}
+                <td>X</td>
+                {% else %}
+                <td>O</td>
+                {% endif %}
+            <!-- skip for idx number -->
+            {% elif forloop.counter == 7 %}
+            {% else %}
+                <td>{{idx}}</td>
+            {% endif %}
         {% endfor %}
     </tr>
     {% endfor %}
 </table>
 <br><br>
+
+{% if display|first > 10 %}
+<a class="w3-button" href="/parkinglist/records/{{display.0|add:'-10'}}"><<</a>
+{% endif %}
+
 {% for x in display %}
-{% if x < totalpagecount %}
-<a class="w3-button" href="/parkinglist/records/{{x}}">{{x}}</a>
-{% endif %}
-{% if forloop.counter == 10 and x < totalpagecount %}
-<a class="w3-button" href="/parkinglist/records/{{display.0|add:'10'}}">>></a>
-{% endif %}
+    <!-- 루프 인덱스(x)가 전체 페이지개수 이하일 경우에만 출력 -->
+    {% if x <= totalpagecount %}
+    <a class="w3-button" href="/parkinglist/records/{{x}}">    
+        {% if x == page %}    
+        <b>{{x}}</b>
+        {% else %}
+        {{x}}
+        {% endif %}
+    </a>
+    {% endif %}
 {% endfor %}
 
+{% if display|last < totalpagecount %}
+<a class="w3-button" href="/parkinglist/records/{{display.0|add:'10'}}">>></a>
+{% endif %}
+
+{% endif %}
 {% endblock %}

@@ -5,6 +5,9 @@
     1년 이상 주차한 차:
 </b>
 <br><br>
+{% if not car %}
+<p>데이터 없음</p>
+{% else %}
 <table class="w3-table w3-bordered">
     {% for idx in car %}
     <tr>
@@ -17,4 +20,5 @@
     {% csrf_token %}
     <input type="submit" value="현황에서 삭제" class="w3-button w3-card w3-light-grey">
 </form>
+{% endif %}
 {% endblock %}
