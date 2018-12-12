@@ -76,10 +76,16 @@ class car():
 
         # 비회원이 올바른 정보 입력 시까지 루프
         while (self.check_inf != 'Y'):
-            self.flight_no = input("비행편 입력 : ")
-            self.check_inf = input("차량번호 : %s , 비행편 : %s 가 맞으십니까?(Y/N) : " % (self.car_no, self.flight_no))
+            self.flight_no = "KE1233"
+            self.check_inf = "Y"
         if self.user == False:
             print("추천 자리 :", self.server.Induce(self.flight_no))
+        
+        sql = """INSERT INTO
+                        parkinglot(carNo, sectionNo, parkingTime, currExist)
+                        VALUES(%s,%s, %s, %s)"""
+        self.cursor.execute(sql, (self.car_no, self.sectionNo, datetime.datetime.now(), 1))
+        self.conn.commit()
 
         self.server.barr_on()
         # self.parking()

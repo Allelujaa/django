@@ -1,9 +1,9 @@
-*.yaml
-requirements.txt
-djangoproject/settings.py
-**(backup).py
-parkinglist/__pychache__
-parkinglist/htmlcov
-parkinglist/migrations
+__pycache__/
+htmlcov/
+migrations/
+.vscode/
+
 *.coverage
 *.gcloudignore
+*(backup).py
+*.log

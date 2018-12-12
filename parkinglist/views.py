@@ -63,6 +63,8 @@ def get_search(request):
             del admin, parkingsystem
 
             return render(request, 'parkinglist/detail.html', {'car': car})
+        else:
+            return Http404('invaild form')
     else:
         form = SearchForm()
 
