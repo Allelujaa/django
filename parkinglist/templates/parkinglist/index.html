@@ -39,12 +39,17 @@
 </div>
 
 <div style="margin-top:50px;margin-left:100px; margin-bottom:100px">
+<<<<<<< HEAD
     <div class="w3-padding-large w3-cell">
         <p><button class="w3-button w3-black"></button> : 주차 불가</p>
         <p><button class="w3-button w3-grey"></button> : 주차 가능</p>
     </div>
     <form class="w3-padding-large w3-cell" method="post">
         <label>비행편을 입력하세요</label>
+=======
+    <form class="w3-padding-large" method="post">
+        <label>비행편</label>
+>>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
         <br><br>
         {% csrf_token %}
         {{form}}
@@ -52,6 +57,7 @@
         <input class="w3-button w3-light-grey" type="submit" value="자리 추천"></button>
     </form>
     {% if recommend %}
+<<<<<<< HEAD
     <div class="w3-padding-large w3-cell">
         <p>검색된 비행편: {{flight}}</p>
         <p>해당 비행편 게이트: {{gate}}</p>
@@ -63,5 +69,18 @@
         <p>구역 {{forloop.counter}}: {{x}} / 100</p>
         {% endfor %}
     </div>
+=======
+    <div class="w3-padding-large">
+        <p>검색된 비행편: {{flight}}</p>
+        <p>해당 비행편 게이트: {{gate}}</p>
+        <p>추천된 자리: <b class="w3-green w3-padding">{{recommend}}</b></p>
+    </p>
+    {% endif %}
+    <div class="w3-padding-large">
+        {% for x in carcount %}
+        <p>구역 {{forloop.counter}}: {{x}} / 100</p>
+        {% endfor %}
+    </p>
+>>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
 </div>
 {% endblock %}

@@ -54,9 +54,12 @@ def get_search(request):
         if form.is_valid():
             data = form.cleaned_data.get('searched_car')
             car = Parkinglot.objects.filter(carno=data)
+<<<<<<< HEAD
             if not car:
                 return render(request, 'parkinglist/detail.html', {'msg': '일치하는 데이터가 없습니다.'})
 
+=======
+>>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
             for x in car:
                 if x.currexist == 1:
                     parkingsystem.calculate(x.carno, command='search')
@@ -66,8 +69,11 @@ def get_search(request):
             del admin, parkingsystem
 
             return render(request, 'parkinglist/detail.html', {'car': car})
+<<<<<<< HEAD
         else:
             return Http404('invaild form')
+=======
+>>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
     else:
         form = SearchForm()
 
@@ -215,8 +221,13 @@ def statistics(request):
                 data = [0 if x == None else x for x in data]
                 # list에서 3개씩 골라 tuple로 묶은 후, tuple의 list로 변환
                 # [('A', 10, 20000), ('B', 5, 1000), ...]
+<<<<<<< HEAD
                 data = [(chr((i // 2) + 65), data[i], data[i + 1]) for i in range(0, 12, 2)]
 
+=======
+                data = [(chr((i // 2) + 65), data[i], data[i + 1]) for i in range(0, 10, 2)]
+                
+>>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
                 context = {
                     'title': '구역 통계',
                     'tabletitle': ['구역', '총 이용 차량 수', '총액'],
