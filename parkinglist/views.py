@@ -221,13 +221,8 @@ def statistics(request):
                 data = [0 if x == None else x for x in data]
                 # list에서 3개씩 골라 tuple로 묶은 후, tuple의 list로 변환
                 # [('A', 10, 20000), ('B', 5, 1000), ...]
-<<<<<<< HEAD
                 data = [(chr((i // 2) + 65), data[i], data[i + 1]) for i in range(0, 12, 2)]
 
-=======
-                data = [(chr((i // 2) + 65), data[i], data[i + 1]) for i in range(0, 10, 2)]
-                
->>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
                 context = {
                     'title': '구역 통계',
                     'tabletitle': ['구역', '총 이용 차량 수', '총액'],

@@ -7,3 +7,5 @@ migrations/
 *.gcloudignore
 *(backup).py
 *.log
+*.sqlite3
+*(backup).py
