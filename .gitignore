@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 __pycache__/
 htmlcov/
 migrations/
@@ -8,14 +7,3 @@ migrations/
 *.gcloudignore
 *(backup).py
 *.log
-=======
-*.yaml
-requirements.txt
-djangoproject/settings.py
-**(backup).py
-parkinglist/__pychache__
-parkinglist/htmlcov
-parkinglist/migrations
-*.coverage
-*.gcloudignore
->>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
