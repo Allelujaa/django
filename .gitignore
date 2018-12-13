@@ -9,3 +9,4 @@ migrations/
 *.log
 *.sqlite3
 *(backup).py
+requirements.txt
