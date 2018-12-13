@@ -3,7 +3,7 @@ import pymysql
 
 f1 = open('emergencyEnter.txt','w+')
 f2 = open('emergencyExit.txt','w+')
-conn = pymysql.connect(host='localhost',port=3306,user='root',password='2018',db = 'software7')
+conn = pymysql.connect(host='localhost',port=3306,user='root',password='2018',db = 'project7')
 cursor = conn.cursor()
 
 def emergency_enter_handler():
@@ -51,7 +51,7 @@ def emergency_exit_handler():
                     break
                 else:
                     RTime = f2.readline().strip('\n')
-                    sql = 'update currparkinglot set carNo = %s , currExist = %s where carNo = %s'
+                    sql = 'update currParkinglot set carNo = %s , currExist = %s where carNo = %s'
                     cursor.execute(sql,(None,0,RcarNo))
                     sql2 = 'update parkinglot set exitTime = %s , currExist = %s where carNo = %s'
                     cursor.execute(sql2,(RTime,0,RcarNo))
@@ -63,7 +63,7 @@ def emergency_exit_handler():
             f2.write(str(Time))
             f2.write('\n')
 
-emergency_enter_handler()
-#emergency_exit_handler()
+# emergency_enter_handler()
+emergency_exit_handler()
 
 

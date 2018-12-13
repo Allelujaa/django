@@ -509,7 +509,6 @@ class admin():
                     self.cursor.execute(sql)
                     for row in self.cursor:
                         data_list.append(row[0]), data_list.append(row[1])
-        
         return data_list
 
         
