@@ -54,12 +54,9 @@ def get_search(request):
         if form.is_valid():
             data = form.cleaned_data.get('searched_car')
             car = Parkinglot.objects.filter(carno=data)
-<<<<<<< HEAD
             if not car:
                 return render(request, 'parkinglist/detail.html', {'msg': '일치하는 데이터가 없습니다.'})
 
-=======
->>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
             for x in car:
                 if x.currexist == 1:
                     parkingsystem.calculate(x.carno, command='search')
@@ -69,11 +66,8 @@ def get_search(request):
             del admin, parkingsystem
 
             return render(request, 'parkinglist/detail.html', {'car': car})
-<<<<<<< HEAD
         else:
             return Http404('invaild form')
-=======
->>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
     else:
         form = SearchForm()
 
@@ -240,16 +234,15 @@ def statistics(request):
                 del admin, parkingsystem
                 raise Http404('잘못된 접근입니다')
 
-            admin.conn.close()
-            parkingsystem.conn.close()
-            del admin, parkingsystem
-
             context['msg'] = '데이터가 없습니다.'
             
         else:
             context = {
                 'msg': '제출한 양식이 올바르지 않습니다.'
             }
+        admin.conn.close()
+        parkingsystem.conn.close()
+        del admin, parkingsystem
         return render(request, 'parkinglist/stats_display.html', context)
     else:
         form = StatsForm()

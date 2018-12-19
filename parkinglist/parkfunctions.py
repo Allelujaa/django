@@ -82,11 +82,7 @@ class car():
             print("추천 자리 :", self.server.Induce(self.flight_no))
 
         self.server.barr_on()
-<<<<<<< HEAD
         # self.parking()
-=======
-        self.parking()
->>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
 
     def parking(self):
         while True:
@@ -438,13 +434,8 @@ class admin():
         if cost_min != None:
             if cost_max != None:
                 q &= Q(cost__range=(cost_min, cost_max))  #cost_min과 cost_max 모두 있음
-<<<<<<< HEAD
             else: q &= Q(cost__gte=cost_min) #cost_min있음
         elif cost_max != None:  q &= Q(cost__lte=cost_max) #cost_max 있음
-=======
-            else: q &= Q(cost__gte=min_cost) #cost_min있음
-        elif cost_max != None:  q &= Q(cost__lte=max_cost) #cost_max 있음
->>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
 
         if sectionno != '':  #주차 구역 조건 있을 때
             q &= Q(sectionno=sectionno)
@@ -518,10 +509,7 @@ class admin():
                     self.cursor.execute(sql)
                     for row in self.cursor:
                         data_list.append(row[0]), data_list.append(row[1])
-<<<<<<< HEAD
-=======
         
->>>>>>> b6a301812d8047e4daf63cf93263516b6edc8bb7
         return data_list
 
         

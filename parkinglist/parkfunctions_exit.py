@@ -6,10 +6,6 @@ from bs4 import BeautifulSoup
 from django.db.models import Q
 import os
 
-html = requests.get(
-    'https://www.airport.co.kr/gimpo/extra/liveSchedule/liveScheduleList/layOut.do?langType=1&inoutType=OUT&cid=2015102611043202364&menuId=8').text
-soup = BeautifulSoup(html, 'html.parser')
-
 # app engine에서 작동할 경우, unix socket으로 db에 연결합니다
 # db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
 if os.environ.get('CHECK_INSTANCE'):
@@ -139,6 +135,10 @@ class car():
 
 
 class parkingsystem():
+    def init(self):
+        self.html = requests.get('https://www.airport.co.kr/gimpo/extra/liveSchedule/liveScheduleList/layOut.do?langType=1&inoutType=OUT&cid=2015102611043202364&menuId=8').text
+        self.soup = BeautifulSoup(html, 'html.parser')
+    
     def CarEnterHandler(self):
         while True:
             print("차량번호 인식")
