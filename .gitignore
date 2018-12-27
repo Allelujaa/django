@@ -2,6 +2,7 @@ __pycache__/
 htmlcov/
 migrations/
 .vscode/
+tests/
 
 *.coverage
 *.gcloudignore
@@ -10,3 +11,5 @@ migrations/
 *.sqlite3
 *(backup).py
 requirements.txt
+parkfunctions_enter.py
+parkfunctions_exit.py

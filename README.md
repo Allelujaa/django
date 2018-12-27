@@ -1,16 +1,6 @@
-# Getting started with Django on Google Cloud Platform on App Engine Standard
+# 소프트웨어공학 7조 주차관리시스템
 
-[![Open in Cloud Shell][shell_img]][shell_link]
-
-[shell_img]: http://gstatic.com/cloudssh/images/open-btn.png
-[shell_link]: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&page=editor&open_in_editor=appengine/standard_python37/django/README.md
-
-This repository is an example of how to run a [Django](https://www.djangoproject.com/) 
-app on Google App Engine Standard Environment. It uses the 
-[Writing your first Django app](https://docs.djangoproject.com/en/2.1/intro/tutorial01/) as the 
-example app to deploy.
-
-
-# Tutorial
-See our [Running Django in the App Engine Standard Environment](https://cloud.google.com/python/django/appengine) tutorial for instructions for setting up and deploying this sample application.
-# django
+주요 기능은 아래 파일에 포함되어있습니다.
+[주차관리시스템 프로그램](https://github.com/Allelujaa/django/blob/master/parkinglist/parkfunctions.py)
+[비상용 입장](https://github.com/Allelujaa/django/blob/master/parkinglist/emergency_enter.py)
+[비상용 퇴장](https://github.com/Allelujaa/django/blob/master/parkinglist/emergency_exit.py)
