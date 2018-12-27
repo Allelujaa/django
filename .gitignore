@@ -11,5 +11,5 @@ tests/
 *.sqlite3
 *(backup).py
 requirements.txt
-parkfunctions_enter.py
-parkfunctions_exit.py
+parkinglist/parkfunctions_enter.py
+parkinglist/parkfunctions_exit.py
