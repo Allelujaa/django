@@ -533,6 +533,6 @@ class admin():
         return data
 
 
-system = parkingsystem()
-# system.CarExitHandler()
-system.CarEnterHandler()
+# system = parkingsystem()
+# # system.CarExitHandler()
+# system.CarEnterHandler()
