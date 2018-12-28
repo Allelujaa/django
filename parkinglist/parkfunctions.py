@@ -132,9 +132,14 @@ class car():
     # 차량 퇴장 함수 // sectionNo 정해지면 sql 문 수정
     def car_out(self):
         sql = "SELECT count(*) FROM currParkinglot WHERE carNo = '%s'" % self.car_no
-        self.cursor.execute(sql)
-        if (self.cursor.fetchone()[0] <= 0):
+        cursor.execute(sql)
+        if (cursor.fetchone()[0] <= 0):
             print("주차 기록이 없는 차량입니다.")
+
+        sql = "SELECT count(*) FROM client WHERE carNo = '%s'" % self.car_no  # 회원 DB에 해당 차량 번호가 있는지 확인, 회원이면 요금 부과되지 않음
+        cursor.execute(sql)
+        if (cursor.fetchone()[0] > 0):
+            print("회원입니다.")                     
 
         else:
             self.server.calculate(self.car_no)
@@ -143,14 +148,14 @@ class car():
                             SET carNo = %s, currExist = %s
                             WHERE carNo = %s
                             """
-            self.cursor.execute(sql, (None, 0, self.car_no))
-            self.conn.commit()
+            cursor.execute(sql, (None, 0, self.car_no))
+            conn.commit()
 
             sql = """update parkinglot
                              set currExist = %s
                              WHERE carNo = %s and currExist = 1"""
-            self.cursor.execute(sql, (0, self.car_no))
-            self.conn.commit()
+            cursor.execute(sql, (0, self.car_no))
+            conn.commit()
 
         self.server.barr_off()
 
