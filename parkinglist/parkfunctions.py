@@ -6,27 +6,6 @@ from bs4 import BeautifulSoup
 from django.db.models import Q
 import os
 
-html = requests.get(
-    'https://www.airport.co.kr/gimpo/extra/liveSchedule/liveScheduleList/layOut.do?langType=1&inoutType=OUT&cid=2015102611043202364&menuId=8').text
-soup = BeautifulSoup(html, 'html.parser')
-
-# 이 프로그램이 메인일 경우 프로그램 시작시 DB에 connect를 합니다.
-# 웹에서 import할 경우, 각 클래스 인스턴스 생성 시점에 connect를 합니다.
-if __name__ == '__main__':
-    # app engine에서 작동할 경우, unix socket으로 db에 연결합니다
-    # db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
-    if os.environ.get('CHECK_INSTANCE'):
-        db_user = os.environ.get('CLOUD_SQL_USERNAME')
-        db_password = os.environ.get('CLOUD_SQL_PASSWORD')
-        db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
-        db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
-        unix_socket = '/cloudsql/{}'.format(db_connection_name)
-        conn = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
-    # 일반 기기에서 작동할 경우, tcp socket으로 db에 연결합니다.
-    else:
-        conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
-    cursor = conn.cursor()
-
 class car():
     def __init__(self,car_no,server):
         self.car_no = car_no
@@ -132,13 +111,13 @@ class car():
     # 차량 퇴장 함수 // sectionNo 정해지면 sql 문 수정
     def car_out(self):
         sql = "SELECT count(*) FROM currParkinglot WHERE carNo = '%s'" % self.car_no
-        cursor.execute(sql)
-        if (cursor.fetchone()[0] <= 0):
+        self.cursor.execute(sql)
+        if (self.cursor.fetchone()[0] <= 0):
             print("주차 기록이 없는 차량입니다.")
 
         sql = "SELECT count(*) FROM client WHERE carNo = '%s'" % self.car_no  # 회원 DB에 해당 차량 번호가 있는지 확인, 회원이면 요금 부과되지 않음
-        cursor.execute(sql)
-        if (cursor.fetchone()[0] > 0):
+        self.cursor.execute(sql)
+        if (self.cursor.fetchone()[0] > 0):
             print("회원입니다.")                     
 
         else:
@@ -148,40 +127,42 @@ class car():
                             SET carNo = %s, currExist = %s
                             WHERE carNo = %s
                             """
-            cursor.execute(sql, (None, 0, self.car_no))
-            conn.commit()
+            self.cursor.execute(sql, (None, 0, self.car_no))
+            self.conn.commit()
 
             sql = """update parkinglot
                              set currExist = %s
                              WHERE carNo = %s and currExist = 1"""
-            cursor.execute(sql, (0, self.car_no))
-            conn.commit()
+            self.cursor.execute(sql, (0, self.car_no))
+            self.conn.commit()
 
         self.server.barr_off()
 
 
 class parkingsystem():
-    if __name__ != '__main__':
-        def __init__(self):
-            # app engine에서 작동할 경우, unix socket으로 db에 연결합니다
-            # db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
-            if os.environ.get('CHECK_INSTANCE'):
-                db_user = os.environ.get('CLOUD_SQL_USERNAME')
-                db_password = os.environ.get('CLOUD_SQL_PASSWORD')
-                db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
-                db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
-                unix_socket = '/cloudsql/{}'.format(db_connection_name)
-                self.conn = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
-            # 일반 기기에서 작동할 경우, tcp socket으로 db에 연결합니다.
-            else:
-                self.conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
-            self.cursor = self.conn.cursor()
+    def __init__(self):
+        # app engine에서 작동할 경우, unix socket으로 db에 연결합니다
+        # db에 대한 정보는 app.yaml의 환경변수에서 볼 수 있습니다.
+        if os.environ.get('CHECK_INSTANCE'):
+            db_user = os.environ.get('CLOUD_SQL_USERNAME')
+            db_password = os.environ.get('CLOUD_SQL_PASSWORD')
+            db_name = os.environ.get('CLOUD_SQL_DATABASE_NAME')
+            db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
+            unix_socket = '/cloudsql/{}'.format(db_connection_name)
+            self.conn = pymysql.connect(user=db_user, password=db_password, unix_socket=unix_socket, db=db_name)
+        # 일반 기기에서 작동할 경우, tcp socket으로 db에 연결합니다.
+        else:
+            self.conn = pymysql.connect(host='localhost', port=3306, user = 'root', password='2018', database = 'project7')
+        self.cursor = self.conn.cursor()
+        self.html = requests.get('https://www.airport.co.kr/gimpo/extra/liveSchedule/liveScheduleList/layOut.do?langType=1&inoutType=OUT&cid=2015102611043202364&menuId=8').text
+        self.soup = BeautifulSoup(self.html, 'html.parser')
 
     def CarEnterHandler(self):
         while True:
             print("차량번호 인식")
             client = car(input(),self)  # 차량번호 입력
             client.car_in()
+            client.parking()
             del client
 
     def CarExitHandler(self):
@@ -251,7 +232,7 @@ class parkingsystem():
         Counter = 0
         Gate_no = -1
 
-        for tag in soup.select('#customer_container > div.table-responsive.mt30 > table > tbody > tr > td'):
+        for tag in self.soup.select('#customer_container > div.table-responsive.mt30 > table > tbody > tr > td'):
             if tag.text == flight_no:
                 Gate_no += (Counter + 7)
 
@@ -552,6 +533,6 @@ class admin():
         return data
 
 
-# system = parkingsystem()
-# # system.CarExitHandler()
-# system.CarEnterHandler()
+system = parkingsystem()
+# system.CarExitHandler()
+system.CarEnterHandler()
